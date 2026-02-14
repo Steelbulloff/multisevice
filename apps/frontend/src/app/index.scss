@@ -1,0 +1,247 @@
+/* index.scss */
+
+/* =========================
+   Базовые стили для body и root
+========================= */
+body {
+  --bg-color: #f5f6fa; /* светлый фон */
+  --text-color: #1f1f1f; /* темный текст */
+  --primary-color: #1890ff; /* синий акцент */
+  --success-color: #52c41a;
+  --warning-color: #faad14;
+  --error-color: #f5222d;
+  --border-radius: 6px;
+  margin: 0;
+
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+
+  #root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
+
+  /* =========================
+     Меню
+  ========================= */
+  .ant-menu {
+    background: var(--bg-color);
+    color: var(--text-color);
+
+    .ant-menu-item,
+    .ant-menu-submenu-title {
+      color: var(--text-color);
+      transition:
+        background 0.2s,
+        color 0.2s;
+    }
+
+    .ant-menu-item:hover,
+    .ant-menu-submenu-title:hover {
+      background: #1890ff; /* мягкий голубой ховер */
+    }
+
+    .ant-menu-item-selected,
+    .ant-menu-submenu-selected {
+      background: var(--primary-color);
+      color: #ffffff;
+    }
+
+    .ant-menu-item-disabled {
+      color: rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  /* =========================
+     Таблицы
+  ========================= */
+  .ant-table {
+    background: var(--bg-color);
+    color: var(--text-color);
+
+    .ant-table-thead > tr > th {
+      background: #eaecef; /* светлый заголовок */
+      color: #1f1f1f;
+    }
+
+    .ant-table-tbody > tr > td {
+      color: #1f1f1f;
+    }
+
+    .ant-table-tbody > tr:hover > td {
+      background: rgba(24, 144, 255, 0.05);
+    }
+
+    .ant-table-tbody > tr.ant-table-row-selected > td {
+      background: var(--primary-color);
+      color: #fff;
+    }
+  }
+
+  /* =========================
+     Кнопки
+  ========================= */
+  .ant-btn {
+    background: var(--bg-color);
+    color: var(--text-color);
+    border-radius: var(--border-radius);
+
+    &-primary {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: #fff;
+
+      &:hover {
+        background: #40a9ff;
+        border-color: #40a9ff;
+      }
+
+      &:active {
+        background: #096dd9;
+        border-color: #096dd9;
+      }
+    }
+
+    &-default {
+      background: #ffffff;
+      border-color: #d9d9d9;
+      color: #1f1f1f;
+
+      &:hover {
+        background: #f0f0f0;
+      }
+    }
+
+    &-danger {
+      background: #f5222d;
+      border-color: #f5222d;
+      color: #fff;
+
+      &:hover {
+        background: #ff4d4f;
+        border-color: #ff4d4f;
+      }
+    }
+  }
+  // Пагинация
+  .ant-pagination {
+    --ant-pagination-item-active-bg: var(--bg-color);
+  }
+
+  /* ===========================================
+     Тёмная тема
+     Добавляем класс .dark-theme на root
+  ============================================ */
+  #root.dark-theme {
+    --bg-color: #141414;
+    --text-color: #e5e5e5;
+    --selected-element-color: #1f1f1f;
+    --primary-color: #1890ff;
+    --success-color: #52c41a;
+    --warning-color: #faad14;
+    --error-color: #f5222d;
+    --border-radius: 6px;
+
+    /* Меню */
+    .ant-menu {
+      background: var(--bg-color);
+      color: var(--text-color);
+
+      .ant-menu-item,
+      .ant-menu-submenu-title {
+        color: var(--text-color);
+      }
+
+      .ant-menu-item:hover,
+      .ant-menu-submenu-title:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .ant-menu-item-selected,
+      .ant-menu-submenu-selected {
+        background: var(--selected-element-color);
+        color: #fff;
+      }
+
+      .ant-menu-item-disabled {
+        color: rgba(255, 255, 255, 0.25);
+      }
+    }
+
+    /* Таблицы */
+    .ant-table {
+      background: var(--bg-color);
+      color: var(--text-color);
+
+      .ant-table-thead > tr > th {
+        background: #1f1f1f;
+        color: #ffffff;
+      }
+
+      .ant-table-tbody > tr > td {
+        color: #e5e5e5;
+      }
+
+      .ant-table-tbody > tr:hover > td {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .ant-table-tbody > tr.ant-table-row-selected > td {
+        background: var(--primary-color);
+        color: #fff;
+      }
+    }
+
+    /* Кнопки */
+    .ant-btn {
+      color: #fff;
+      border-radius: var(--border-radius);
+
+      &-primary {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+
+        &:hover {
+          background: #40a9ff;
+          border-color: #40a9ff;
+        }
+
+        &:active {
+          background: #096dd9;
+          border-color: #096dd9;
+        }
+      }
+
+      &-default {
+        background: #1f1f1f;
+        border-color: #333;
+        color: #e5e5e5;
+
+        &:hover {
+          background: #262626;
+        }
+      }
+
+      &-danger {
+        background: #f5222d;
+        border-color: #f5222d;
+        color: #fff;
+
+        &:hover {
+          background: #ff4d4f;
+          border-color: #ff4d4f;
+        }
+      }
+    }
+
+    // Пагинация
+    .ant-pagination {
+      --ant-pagination-item-active-bg: var(--bg-color);
+    }
+  }
+}
