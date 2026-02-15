@@ -76,10 +76,10 @@ body {
       background: rgba(24, 144, 255, 0.05);
     }
 
-    .ant-table-tbody > tr.ant-table-row-selected > td {
-      background: var(--primary-color);
-      color: #fff;
-    }
+    // .ant-table-tbody > tr.ant-table-row-selected > td {
+    // background: var(--primary-color);
+    // color: #fff;
+    // }
   }
 
   /* =========================
@@ -136,7 +136,7 @@ body {
      Тёмная тема
      Добавляем класс .dark-theme на root
   ============================================ */
-  #root.dark-theme {
+  &.dark-theme {
     --bg-color: #141414;
     --text-color: #e5e5e5;
     --selected-element-color: #1f1f1f;
@@ -159,6 +159,11 @@ body {
       .ant-menu-item:hover,
       .ant-menu-submenu-title:hover {
         background: rgba(255, 255, 255, 0.08);
+      }
+
+      .ant-menu-item:active,
+      .ant-menu-submenu-title:hover {
+        background-color: rgba(255, 255, 255, 0.08) !important;
       }
 
       .ant-menu-item-selected,
@@ -191,7 +196,7 @@ body {
       }
 
       .ant-table-tbody > tr.ant-table-row-selected > td {
-        background: var(--primary-color);
+        background: var(--selected-element-color) !important;
         color: #fff;
       }
     }
@@ -224,6 +229,7 @@ body {
 
         &:hover {
           background: #262626;
+          background-color: var(--selected-element-color) !important;
         }
       }
 
@@ -242,6 +248,30 @@ body {
     // Пагинация
     .ant-pagination {
       --ant-pagination-item-active-bg: var(--bg-color);
+    }
+
+    .ant-popover {
+      background: var(--bg-color);
+      color: var(--text-color);
+
+      .ant-popover-container {
+        background-color: var(--bg-color);
+      }
+    }
+
+    .ant-modal-container {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+    .ant-input {
+      background: var(--selected-element-color);
+      color: var(--text-color);
+      &.ant-input-status-error {
+        background: var(--selected-element-color) !important;
+      }
+    }
+    .ant-input::placeholder {
+      color: var(--text-color);
     }
   }
 }

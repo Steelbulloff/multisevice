@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, In } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Links } from './entities/links.entity';
 import { LinkStat } from './entities/stat.entity';
@@ -23,7 +23,10 @@ export class LinksService {
   async createLink(data: CreateLinkDto, userId: number): Promise<Links> {
     // 1. Проверка на существующую ссылку
     const existingLink = await this.linksRepository.findOne({
-      where: { origin: data.origin },
+      where: {
+        origin: data.origin,
+        user: { id: userId },
+      },
     });
 
     if (existingLink) {
@@ -83,24 +86,25 @@ export class LinksService {
     // 4. Формируем результат
     return {
       ...result,
-      short_link: `${this.configService.get('APP_URL')}${result.short_link}`,
+      short_link: `${this.configService.get('SERVER_URL')}${result.short_link}`,
     };
   }
 
-  async getLinks() {
+  async getLinks(userId: number) {
     const links = await this.linksRepository.find({
+      where: {
+        user: { id: userId }, // 🔥 вот ключевая строка
+      },
       relations: ['statistic', 'statistic.days_info'],
     });
 
-    const fullLinks = links.map((link) => ({
+    return links.map((link) => ({
       ...link,
-      short_link: `${this.configService.get('APP_URL')}/${link.short_link}`,
+      short_link: `${this.configService.get('SERVER_URL')}/${link.short_link}`,
     }));
-
-    return fullLinks;
   }
 
-  async getLinkInfo(id: number, GetLinkDto?: GetLinkDto) {
+  async getLinkInfo(id: number, userId: number, GetLinkDto?: GetLinkDto) {
     const { dateList } = GetLinkDto || {};
 
     let dateSet: Set<string> | null = null;
@@ -110,7 +114,10 @@ export class LinksService {
     }
 
     const link = await this.linksRepository.findOne({
-      where: { id },
+      where: {
+        id,
+        user: { id: userId }, // 🔐 защита
+      },
       relations: ['statistic', 'statistic.days_info'],
     });
 
@@ -139,21 +146,24 @@ export class LinksService {
       id: link.id,
       name: link.name,
       origin: link.origin,
-      short_link: `${this.configService.get('APP_URL')}/${link.short_link}`,
+      short_link: `${this.configService.get('SERVER_URL')}/${link.short_link}`,
       totalCounter,
       daysInfo: filteredDaysInfo,
     };
   }
 
-  async removeLinks({ ids }: DeleteLinksDto) {
-    if (!ids || ids.length === 0) {
+  async removeLinks({ ids }: DeleteLinksDto, userId: number) {
+    if (!ids?.length) {
       throw new HttpException(
         'No IDs provided for deletion',
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    await this.linksRepository.delete(ids);
+    await this.linksRepository.delete({
+      id: In(ids),
+      user: { id: userId }, // 🔐 защита
+    });
   }
 
   private readonly recentRedirects = new Map<string, number>();

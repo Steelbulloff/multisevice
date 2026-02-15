@@ -28,7 +28,7 @@ export class User {
   })
   dateOfCreated?: Date;
 
-  @OneToMany(() => Links, (links) => links.userId, {
+  @OneToMany(() => Links, (links) => links.user, {
     cascade: true,
     onDelete: 'CASCADE',
   })

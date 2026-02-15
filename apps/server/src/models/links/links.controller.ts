@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -15,32 +16,41 @@ import { CreateLinkDto, DeleteLinksDto, GetLinkDto } from './dto';
 import type { Request, Response } from 'express';
 import { Public } from 'src/core';
 
-@Controller()
+@Controller('links')
 export class LinksController {
   constructor(private readonly linksService: LinksService) {}
   @UseGuards(JwtAuthGuard)
-  @Post('api/create')
+  @Post()
   createLink(@Body() params: CreateLinkDto, @Req() req: any) {
     return this.linksService.createLink(params, req.user.userId);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('api/get-links')
-  getLinks() {
-    return this.linksService.getLinks();
+  @Get()
+  getLinks(@Req() req: any) {
+    return this.linksService.getLinks(req.user.userId);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('api/get-link/:id')
-  getLinkInfo(@Param('id') id: number, @Query() query: GetLinkDto) {
-    return this.linksService.getLinkInfo(id, query);
+  @Get(':id')
+  getLinkInfo(
+    @Param('id') id: number,
+    @Req() req: any,
+    @Query() query: GetLinkDto,
+  ) {
+    return this.linksService.getLinkInfo(Number(id), req.user.userId, query);
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('api/delete')
-  removeLinks(@Body() params: DeleteLinksDto) {
-    return this.linksService.removeLinks(params);
+  @Delete()
+  removeLinks(@Body() params: DeleteLinksDto, @Req() req: any) {
+    return this.linksService.removeLinks(params, req.user.userId);
   }
+}
+
+@Controller()
+export class RedirectController {
+  constructor(private readonly linksService: LinksService) {}
   @Public()
   @Get(':shortPath')
   async redirectToOriginal(

@@ -12,8 +12,7 @@ export const Root = () => {
   );
 
   useEffect(() => {
-    const root = document.getElementById("root");
-    root?.classList.toggle("dark-theme", isDark);
+    document.body.classList.toggle("dark-theme", isDark);
     localStorage.setItem("theme", isDark ? "Dark" : "Light");
     setCurrentTheme(isDark ? themes.dark : themes.light);
   }, [isDark]);

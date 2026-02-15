@@ -4,17 +4,17 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class PostgreSQLConfigService {
   constructor(private configService: ConfigService) {
-    console.log('DB Host:', this.configService.get<string>('DATABASE_HOST'));
-    console.log('DB Port:', this.configService.get<number>('DATABASE_PORT'));
-    console.log(
-      'DB User:',
-      this.configService.get<string>('DATABASE_USERNAME'),
-    );
-    console.log(
-      'DB Password:',
-      this.configService.get<string>('DATABASE_PASSWORD'),
-    );
-    console.log('DB Name:', this.configService.get<string>('DATABASE_NAME'));
+    // console.log('DB Host:', this.configService.get<string>('DATABASE_HOST'));
+    // console.log('DB Port:', this.configService.get<number>('DATABASE_PORT'));
+    // console.log(
+    //   'DB User:',
+    //   this.configService.get<string>('DATABASE_USERNAME'),
+    // );
+    // console.log(
+    //   'DB Password:',
+    //   this.configService.get<string>('DATABASE_PASSWORD'),
+    // );
+    // console.log('DB Name:', this.configService.get<string>('DATABASE_NAME'));
   }
 
   get host(): string {

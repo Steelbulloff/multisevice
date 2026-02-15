@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -9,7 +10,7 @@ import {
 } from 'typeorm';
 import { LinkStat } from './stat.entity';
 import { User } from 'src/models/auth/entities';
-@Entity({ name: 'Links' })
+@Entity({ name: 'links' })
 export class Links {
   @PrimaryGeneratedColumn()
   id: number;
@@ -32,11 +33,9 @@ export class Links {
   @ManyToOne(() => User, (user) => user.links, {
     onDelete: 'CASCADE',
   })
-  userId: User;
+  @JoinColumn({ name: 'user' })
+  user: User;
 
   @CreateDateColumn()
   createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

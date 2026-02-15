@@ -6,7 +6,7 @@ import { Leftbar } from "../widgets";
 import "./index.scss";
 import { useAuthStore } from "../core";
 import { useEffect } from "react";
-import { Loader } from "../shared";
+import { Loader, Modals } from "../shared";
 
 function App() {
   const { isAuthenticated, initialize, isLoading } = useAuthStore();
@@ -28,6 +28,7 @@ function App() {
         <Flex flex={1}>
           <Leftbar />
           <Pages />
+          <Modals />
         </Flex>
       ) : (
         <>

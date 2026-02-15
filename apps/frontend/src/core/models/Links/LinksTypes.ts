@@ -19,7 +19,7 @@ export interface Link {
 export interface LinksColumnsDataTypes {
   key: number;
   id: number;
-  func: Link; // Весь объект ссылки для кнопок
+  action: Link; // Весь объект ссылки для кнопок
   name: string;
   origin: string;
   newLink: string;
