@@ -10,15 +10,21 @@ export const useLinksStore = create<LinksState>((set) => ({
   selectedLink: null,
   selectedLinks: [],
   error: null,
+  selectedDomen: null,
 
   setSelectedLinks: (ids: any[]) => {
     set({ selectedLinks: ids });
   },
+
   setSelectedLink: (link: Link) => {
     set((state: LinksState) => ({
       ...state,
       selectedLink: link,
     }));
+  },
+
+  setSelectedDomen: (domen: string) => {
+    set({ selectedDomen: domen });
   },
 
   createLink: async (name: string, origin: string) => {

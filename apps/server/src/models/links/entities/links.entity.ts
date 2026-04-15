@@ -3,6 +3,8 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -10,6 +12,8 @@ import {
 } from 'typeorm';
 import { LinkStat } from './stat.entity';
 import { User } from 'src/models/auth/entities';
+import { LinksDomenRegion } from './domen_region.entity';
+import { LinksTags } from './tags.entity';
 @Entity({ name: 'links' })
 export class Links {
   @PrimaryGeneratedColumn()
@@ -38,4 +42,12 @@ export class Links {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToMany(() => LinksDomenRegion)
+  @JoinTable() // создает промежуточную таблицу
+  domen_region: LinksDomenRegion[];
+
+  @ManyToMany(() => LinksTags)
+  @JoinTable() // создает промежуточную таблицу
+  tags: LinksTags[];
 }

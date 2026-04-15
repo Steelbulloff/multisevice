@@ -11,7 +11,14 @@ export class JWTConfigService {
   }
 
   get secret(): string {
-    return this.configService.getOrThrow<string>('jwt.secret');
+    // Попробуйте сначала получить просто из процесса, чтобы понять, загрузился ли .env
+    const fromEnv = process.env.JWT_SECRET;
+    const fromConfig = this.configService.get<string>('jwt.secret');
+
+    console.log('DEBUG: process.env.JWT_SECRET =', fromEnv);
+    console.log('DEBUG: configService.get =', fromConfig);
+
+    return fromConfig || fromEnv || ''; // Временный хак для проверки
   }
   get refresh_secret(): string {
     return this.configService.getOrThrow<string>('jwt.refresh_secret');

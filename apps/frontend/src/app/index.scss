@@ -199,6 +199,10 @@ body {
         background: var(--selected-element-color) !important;
         color: #fff;
       }
+
+      .ant-table-tbody .ant-table-row > .ant-table-cell-row-hover {
+        background: var(--selected-element-color) !important;
+      }
     }
 
     /* Кнопки */
@@ -263,6 +267,7 @@ body {
       background-color: var(--bg-color);
       color: var(--text-color);
     }
+
     .ant-input {
       background: var(--selected-element-color);
       color: var(--text-color);
@@ -270,6 +275,28 @@ body {
         background: var(--selected-element-color) !important;
       }
     }
+
+    .ant-select {
+      background: var(--selected-element-color);
+      color: var(--text-color);
+      &.ant-input-status-error {
+        background: var(--selected-element-color) !important;
+      }
+      .ant-select-content {
+        color: var(--text-color) !important;
+      }
+      .ant-select-suffix {
+        color: var(--text-color) !important;
+      }
+    }
+    .ant-select-dropdown {
+      background: var(--selected-element-color);
+      color: var(--text-color);
+      .ant-select-item-option-selected {
+        background: var(--selected-element-color);
+      }
+    }
+
     .ant-input::placeholder {
       color: var(--text-color);
     }

@@ -4,7 +4,7 @@ import { configuration } from './configuration';
 import { PostgreSQLConfigService } from './config.service';
 
 @Module({
-  imports: [ConfigModule.forRoot({ load: [configuration] })],
+  imports: [ConfigModule.forFeature(configuration)],
   providers: [ConfigService, PostgreSQLConfigService],
   exports: [ConfigService, PostgreSQLConfigService],
 })

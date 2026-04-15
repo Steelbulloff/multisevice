@@ -16,6 +16,7 @@ export const Links = () => {
     setSelectedLinks,
     removeSelectedLinks,
     getLinks,
+    setSelectedDomen,
   } = useLinksStore();
   const { setCreateLinkModal } = useModalsStore();
 
@@ -32,12 +33,17 @@ export const Links = () => {
     key: el.id,
     id: el.id,
     action: el,
+    domens: el,
     name: el.name,
     origin: el.origin,
     newLink: el.short_link,
     counter: el.statistic.global_counter,
     createdAt: el.createdAt,
   }));
+
+  useEffect(() => {
+    setSelectedDomen(links[0]?.domains[0]?.domen);
+  }, [links]);
 
   return (
     <Flex className={styles.links} vertical flex={1}>

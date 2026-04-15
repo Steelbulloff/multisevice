@@ -4,7 +4,10 @@ import { JWTConfigService } from './config.service';
 import { configuration } from './configuration';
 
 @Module({
-  imports: [ConfigModule.forRoot({ load: [configuration], isGlobal: true })],
+  imports: [
+    // Используем forFeature вместо forRoot!
+    ConfigModule.forFeature(configuration),
+  ],
   providers: [JWTConfigService],
   exports: [JWTConfigService],
 })

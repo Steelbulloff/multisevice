@@ -4,12 +4,7 @@ import { configuration } from './configuration';
 import { AppConfigService } from './config.service';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [configuration],
-    }),
-  ],
+  imports: [ConfigModule.forFeature(configuration)],
   providers: [AppConfigService],
   exports: [AppConfigService],
 })

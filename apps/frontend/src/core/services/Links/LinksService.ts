@@ -11,7 +11,8 @@ class LinkApiService {
     return response.data;
   }
 
-  async getLinks(): Promise<Link[]> {
+  async getLinks(): Promise<any> {
+    // async getLinks(): Promise<Link[]> {
     const response = await api.get(controller);
     return response.data;
   }

@@ -64,15 +64,20 @@ export class RedirectController {
         req.socket?.remoteAddress ||
         '';
 
+      const host = req.headers.host || ''; // Получаем домен, например "site1.ru"
       const originalUrl =
-        await this.linksService.getOriginalUrlAndIncreaseCounter(shortPath, ip);
+        await this.linksService.getOriginalUrlAndIncreaseCounter(
+          shortPath,
+          ip,
+          host,
+        );
 
       return res.send(`
       <html>
         <head><meta http-equiv="refresh" content="0;url=${originalUrl}" /></head>
       </html>
     `);
-    } catch (error) {
+    } catch (error: any) {
       return res.status(error.status || 500).json({ message: error.message });
     }
   }

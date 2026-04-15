@@ -6,7 +6,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { DaysInfo } from './days-info.entity';
+import { DaysInfo } from './days_info.entity';
 import { Links } from './links.entity';
 @Entity('link_stat')
 export class LinkStat {

@@ -2,11 +2,11 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, In } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { Links } from './entities/links.entity';
-import { LinkStat } from './entities/stat.entity';
-import { DaysInfo } from './entities/days-info.entity';
+
 import { CreateLinkDto, DeleteLinksDto, GetLinkDto } from './dto';
 import { ConfigService } from '@nestjs/config';
+import { DaysInfo, Links, LinksDomenRegion, LinkStat } from './entities';
+import { LinksTags } from './entities/tags.entity';
 
 @Injectable()
 export class LinksService {
@@ -17,9 +17,13 @@ export class LinksService {
     private linkStatRepository: Repository<LinkStat>,
     @InjectRepository(DaysInfo)
     private daysInfoRepository: Repository<DaysInfo>,
+    @InjectRepository(LinksDomenRegion)
+    private linksDomenRegionRepository: Repository<LinksDomenRegion>,
+    private linksTagsRepository: Repository<LinksTags>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
+  // TODO:Подготовить добавление/удаление/редактирование тегов для ссылок
   async createLink(data: CreateLinkDto, userId: number): Promise<Links> {
     // 1. Проверка на существующую ссылку
     const existingLink = await this.linksRepository.findOne({
@@ -47,6 +51,9 @@ export class LinksService {
       });
     } while (exists);
 
+    const allDomains = await this.linksDomenRegionRepository.find();
+    console.log(allDomains);
+
     // 3. Создание и сохранение в транзакции
     const result = await this.dataSource.transaction(async (manager) => {
       // 3.1. Сохраняем основную ссылку
@@ -56,6 +63,7 @@ export class LinksService {
           origin: data.origin,
           short_link: shortPath,
           user: { id: userId },
+          domen_region: allDomains,
         }),
       );
 
@@ -86,7 +94,7 @@ export class LinksService {
     // 4. Формируем результат
     return {
       ...result,
-      short_link: `${this.configService.get('SERVER_URL')}${result.short_link}`,
+      short_link: result.short_link,
     };
   }
 
@@ -95,12 +103,17 @@ export class LinksService {
       where: {
         user: { id: userId }, // 🔥 вот ключевая строка
       },
-      relations: ['statistic', 'statistic.days_info'],
+      relations: ['statistic', 'statistic.days_info', 'domen_region'],
     });
 
     return links.map((link) => ({
-      ...link,
-      short_link: `${this.configService.get('SERVER_URL')}/${link.short_link}`,
+      id: link.id,
+      name: link.name,
+      origin: link.origin,
+      short_link: link.short_link,
+      domains: link.domen_region,
+      statistic: link.statistic,
+      createdAt: link.createdAt,
     }));
   }
 
@@ -118,7 +131,7 @@ export class LinksService {
         id,
         user: { id: userId }, // 🔐 защита
       },
-      relations: ['statistic', 'statistic.days_info'],
+      relations: ['statistic', 'statistic.days_info', 'domen_region'],
     });
 
     if (!link) {
@@ -146,7 +159,8 @@ export class LinksService {
       id: link.id,
       name: link.name,
       origin: link.origin,
-      short_link: `${this.configService.get('SERVER_URL')}/${link.short_link}`,
+      short_link: link.short_link,
+      domains: link.domen_region,
       totalCounter,
       daysInfo: filteredDaysInfo,
     };
@@ -180,6 +194,7 @@ export class LinksService {
   async getOriginalUrlAndIncreaseCounter(
     shortPath: string,
     ip: string,
+    host: string,
   ): Promise<string> {
     if (this.hasRecentlyRedirected(ip, shortPath)) {
       console.log(`⛔ Игнорируем повторный запрос с IP ${ip} на ${shortPath}`);
@@ -197,6 +212,9 @@ export class LinksService {
     if (!link) {
       throw new HttpException('Short link not found', HttpStatus.NOT_FOUND);
     }
+    const domainEntity = host
+      ? await this.linksDomenRegionRepository.findOneBy({ domen: host })
+      : null;
 
     const statId = link.statistic.id;
 
@@ -212,27 +230,28 @@ export class LinksService {
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Обнуляем время для сравнения дат
 
-      const todayString = today.toISOString().split('T')[0];
-
-      const existing = await manager
-        .createQueryBuilder(DaysInfo, 'd')
-        .setLock('pessimistic_write')
-        .where('d.linkStatId = :statId', { statId })
-        .andWhere('d.date = :today', { today }) // Используем поле date для поиска
-        .getOne();
+      const existing = await manager.findOne(DaysInfo, {
+        where: {
+          link_stat: { id: link.statistic.id },
+          date: today,
+          domen: domainEntity ? { id: domainEntity.id } : { id: undefined },
+        },
+        lock: { mode: 'pessimistic_write' },
+      });
 
       if (existing) {
         await manager.update(DaysInfo, existing.id, {
           counter: () => 'counter + 1',
         });
       } else {
-        const newInfo = manager.create(DaysInfo, {
-          counter: 1,
-          date: today, // ✅ Добавляем обязательное поле date
-          link_stat: link.statistic,
-          createdAt: new Date(),
-        });
-        await manager.save(DaysInfo, newInfo);
+        await manager.save(
+          manager.create(DaysInfo, {
+            counter: 1,
+            date: today,
+            link_stat: link.statistic,
+            domen: domainEntity || undefined, // undefined для TypeORM превратится в NULL в БД
+          }),
+        );
       }
     });
 

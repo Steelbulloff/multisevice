@@ -1,13 +1,14 @@
 import { StockOutlined } from "@ant-design/icons";
-import { Button, Flex, Typography } from "antd";
+import { Button, Flex, Select, Typography } from "antd";
 import type { ColumnType } from "antd/es/table";
 import { format } from "date-fns";
 import type { Link, LinksColumnsDataTypes } from "../models";
 import { useLinksStore, useModalsStore } from "../stores";
 
 export const getColumns = (): ColumnType<LinksColumnsDataTypes>[] => {
-  const { setSelectedLink } = useLinksStore();
+  const { setSelectedLink, setSelectedDomen, selectedDomen } = useLinksStore();
   const { setStatisticModal } = useModalsStore();
+
   return [
     { title: "id", dataIndex: "id" },
     {
@@ -26,6 +27,20 @@ export const getColumns = (): ColumnType<LinksColumnsDataTypes>[] => {
         </Flex>
       ),
     },
+    {
+      title: "Домен",
+      dataIndex: "domens",
+      render: (el: Link) => (
+        <Select
+          defaultValue={el.domains[0]?.name}
+          style={{ width: 120 }}
+          onChange={(domen) => setSelectedDomen(domen)}
+          options={el.domains.map((domenObj) => {
+            return { value: domenObj.domen, label: domenObj.name };
+          })}
+        />
+      ),
+    },
     { title: "Название", dataIndex: "name", align: "center" },
     { title: "Оригинальная ссылка", dataIndex: "origin", align: "center" },
     {
@@ -37,7 +52,7 @@ export const getColumns = (): ColumnType<LinksColumnsDataTypes>[] => {
           style={{ marginBottom: 0, marginTop: 0 }}
           copyable
         >
-          {shortLink}
+          {selectedDomen + "/" + shortLink}
         </Typography.Paragraph>
       ),
     },
