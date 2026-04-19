@@ -1,3 +1,5 @@
+import type { TagType } from "../../../shared";
+
 export interface Link {
   createdAt: Date;
   id: number;
@@ -5,6 +7,7 @@ export interface Link {
   origin: string;
   short_link: string;
   domains: LinkDomen[];
+  tags?: TagType[];
   statistic: {
     days_info: {
       counter: number;

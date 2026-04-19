@@ -28,10 +28,34 @@ export const Links = () => {
   useEffect(() => {
     getLinks();
   }, []);
+  const testTags = [
+    {
+      id: 1,
+      name: "kek",
+    },
+    {
+      id: 2,
+      name: "asdasd",
+    },
+    {
+      id: 3,
+      name: "zxczxc",
+    },
+    {
+      id: 4,
+      name: "kdfgdfek",
+    },
+    {
+      id: 5,
+      name: "dfgdfhhjh",
+    },
+  ];
 
   const dataSource: LinksColumnsDataTypes[] = links.map((el: Link) => ({
     key: el.id,
     id: el.id,
+    tags: testTags,
+    // tags: el.tags,
     action: el,
     domens: el,
     name: el.name,

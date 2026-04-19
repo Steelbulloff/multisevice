@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth';
 import { LinksService } from './links.service';
-import { CreateLinkDto, DeleteLinksDto, GetLinkDto } from './dto';
+import { CreateLinkDto, CreateTagDto, DeleteLinksDto, GetLinkDto } from './dto';
 import type { Request, Response } from 'express';
 import { Public } from 'src/core';
 
@@ -45,6 +45,12 @@ export class LinksController {
   @Delete()
   removeLinks(@Body() params: DeleteLinksDto, @Req() req: any) {
     return this.linksService.removeLinks(params, req.user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('create-tag')
+  createTag(@Body() params: CreateTagDto, @Req() req: any) {
+    return this.linksService.createTag(params, req.user.userId);
   }
 }
 

@@ -1,16 +1,48 @@
 import { StockOutlined } from "@ant-design/icons";
-import { Button, Flex, Select, Typography } from "antd";
+import { Button, Flex, Select, Tag, Typography } from "antd";
 import type { ColumnType } from "antd/es/table";
 import { format } from "date-fns";
 import type { Link, LinksColumnsDataTypes } from "../models";
 import { useLinksStore, useModalsStore } from "../stores";
+import type { TagType } from "../../shared";
 
 export const getColumns = (): ColumnType<LinksColumnsDataTypes>[] => {
   const { setSelectedLink, setSelectedDomen, selectedDomen } = useLinksStore();
   const { setStatisticModal } = useModalsStore();
 
+  const tagsPreset = [
+    "magenta",
+    "red",
+    "volcano",
+    "orange",
+    "gold",
+    "lime",
+    "green",
+    "cyan",
+    "blue",
+    "geekblue",
+    "purple",
+  ];
+
   return [
     { title: "id", dataIndex: "id" },
+    {
+      title: "Теги",
+      dataIndex: "tags",
+      align: "center",
+      render: (el: TagType[]) => (
+        <Flex gap={"small"} justify="center" wrap style={{ maxWidth: "120px" }}>
+          {el.map((tag) => (
+            <Tag
+              key={tag.id}
+              color={tagsPreset[Math.floor(Math.random() * tagsPreset.length)]}
+            >
+              {tag.name}
+            </Tag>
+          ))}
+        </Flex>
+      ),
+    },
     {
       title: "Функционал",
       dataIndex: "action",
@@ -30,6 +62,7 @@ export const getColumns = (): ColumnType<LinksColumnsDataTypes>[] => {
     {
       title: "Домен",
       dataIndex: "domens",
+      align: "center",
       render: (el: Link) => (
         <Select
           defaultValue={el.domains[0]?.name}

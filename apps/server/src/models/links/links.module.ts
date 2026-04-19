@@ -2,11 +2,23 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LinksController, RedirectController } from './links.controller';
 import { LinksService } from './links.service';
-import { DaysInfo, Links, LinksDomenRegion, LinkStat } from './entities';
+import {
+  DaysInfo,
+  Links,
+  LinksDomenRegion,
+  LinksTags,
+  LinkStat,
+} from './entities';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([LinkStat, DaysInfo, Links, LinksDomenRegion]),
+    TypeOrmModule.forFeature([
+      LinkStat,
+      DaysInfo,
+      Links,
+      LinksDomenRegion,
+      LinksTags,
+    ]),
   ],
   providers: [LinksService],
   controllers: [LinksController, RedirectController],

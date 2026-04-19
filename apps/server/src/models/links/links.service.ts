@@ -3,10 +3,15 @@ import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { Repository, DataSource, In } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { CreateLinkDto, DeleteLinksDto, GetLinkDto } from './dto';
+import { CreateLinkDto, CreateTagDto, DeleteLinksDto, GetLinkDto } from './dto';
 import { ConfigService } from '@nestjs/config';
-import { DaysInfo, Links, LinksDomenRegion, LinkStat } from './entities';
-import { LinksTags } from './entities/tags.entity';
+import {
+  DaysInfo,
+  Links,
+  LinksDomenRegion,
+  LinksTags,
+  LinkStat,
+} from './entities';
 
 @Injectable()
 export class LinksService {
@@ -17,8 +22,11 @@ export class LinksService {
     private linkStatRepository: Repository<LinkStat>,
     @InjectRepository(DaysInfo)
     private daysInfoRepository: Repository<DaysInfo>,
+
     @InjectRepository(LinksDomenRegion)
     private linksDomenRegionRepository: Repository<LinksDomenRegion>,
+
+    @InjectRepository(LinksTags)
     private linksTagsRepository: Repository<LinksTags>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
@@ -52,7 +60,6 @@ export class LinksService {
     } while (exists);
 
     const allDomains = await this.linksDomenRegionRepository.find();
-    console.log(allDomains);
 
     // 3. Создание и сохранение в транзакции
     const result = await this.dataSource.transaction(async (manager) => {
@@ -181,7 +188,6 @@ export class LinksService {
   }
 
   private readonly recentRedirects = new Map<string, number>();
-
   private hasRecentlyRedirected(ip: string, shortPath: string): boolean {
     const key = `${ip}_${shortPath}`;
     const now = Date.now();
@@ -256,5 +262,27 @@ export class LinksService {
     });
 
     return link.origin;
+  }
+
+  // TODO: Проверка на существование по нижнему регистру???
+  async createTag(tag: CreateTagDto, userId: number): Promise<LinksTags> {
+    const existingTag = await this.linksTagsRepository.findOne({
+      where: {
+        name: tag.name,
+        user: { id: userId },
+      },
+    });
+    if (existingTag) {
+      throw new HttpException(
+        'Тэг с таким именем уже существует',
+        HttpStatus.CONFLICT,
+      );
+    }
+
+    const newTag = await this.linksTagsRepository.save({
+      name: tag.name,
+      user: { id: userId },
+    });
+    return newTag;
   }
 }

@@ -1,4 +1,5 @@
 import { Links } from 'src/models/links/entities/links.entity';
+import { LinksTags } from 'src/models/links/entities/tags.entity';
 import {
   Column,
   CreateDateColumn,
@@ -33,4 +34,10 @@ export class User {
     onDelete: 'CASCADE',
   })
   links: Links[];
+
+  @OneToMany(() => LinksTags, (tags) => tags.user, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  tags: LinksTags[];
 }

@@ -8,7 +8,6 @@ import {
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { LinkStat } from './stat.entity';
 import { User } from 'src/models/auth/entities';
@@ -48,6 +47,6 @@ export class Links {
   domen_region: LinksDomenRegion[];
 
   @ManyToMany(() => LinksTags)
-  @JoinTable() // создает промежуточную таблицу
+  @JoinTable()
   tags: LinksTags[];
 }
