@@ -5,6 +5,7 @@
     "frontend:install": "cd apps/frontend && npm install",
     "frontend:dev": "cd apps/frontend && npm run dev",
     "frontend:build": "cd apps/frontend && npm run build",
+    "frontend:prev": "cd apps/frontend && npm run preview",
     "server:install": "cd apps/server && npm install",
     "server:dev": "cd apps/server && npm run start:dev",
     "server:build": "cd apps/server && npm run build",

@@ -1,5 +1,5 @@
 import { type FC } from "react";
-import { Modal } from "antd";
+import { Flex, Modal } from "antd";
 import {
   Bar,
   BarChart,
@@ -11,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import { GraphData, useLinksStore, useModalsStore } from "../../../../core";
+import { DomainPicker } from "../../../../pages/Links/components";
 import { RangePicker } from "../../Components";
 
 export const Statistic: FC = () => {
@@ -25,7 +26,7 @@ export const Statistic: FC = () => {
       title={"Статистика по ссылке " + selectedLink?.name}
       open={showStatisticModal}
       width="90vmax"
-      bodyStyle={{ height: "60vh" }}
+      styles={{ body: { height: "60vh", padding: "16px" } }} // ✅ вместо bodyStyle
       onCancel={() => setStatisticModal(false)}
     >
       <div style={{ width: "100%", height: "100%" }}>
@@ -43,7 +44,10 @@ export const Statistic: FC = () => {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      <RangePicker />
+      <Flex gap={"1rem"}>
+        <DomainPicker />
+        <RangePicker />
+      </Flex>
     </Modal>
   );
 };

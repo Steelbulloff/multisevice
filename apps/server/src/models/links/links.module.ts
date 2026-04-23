@@ -5,7 +5,7 @@ import { LinksService } from './links.service';
 import {
   DaysInfo,
   Links,
-  LinksDomenRegion,
+  LinksDomainRegion,
   LinksTags,
   LinkStat,
 } from './entities';
@@ -16,7 +16,7 @@ import {
       LinkStat,
       DaysInfo,
       Links,
-      LinksDomenRegion,
+      LinksDomainRegion,
       LinksTags,
     ]),
   ],

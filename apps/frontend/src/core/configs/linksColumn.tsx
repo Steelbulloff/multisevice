@@ -7,7 +7,8 @@ import { useLinksStore, useModalsStore } from "../stores";
 import type { TagType } from "../../shared";
 
 export const getColumns = (): ColumnType<LinksColumnsDataTypes>[] => {
-  const { setSelectedLink, setSelectedDomen, selectedDomen } = useLinksStore();
+  const { setSelectedLink, setSelectedDomain, selectedDomain } =
+    useLinksStore();
   const { setStatisticModal } = useModalsStore();
 
   const tagsPreset = [
@@ -67,9 +68,9 @@ export const getColumns = (): ColumnType<LinksColumnsDataTypes>[] => {
         <Select
           defaultValue={el.domains[0]?.name}
           style={{ width: 120 }}
-          onChange={(domen) => setSelectedDomen(domen)}
+          onChange={(domain) => setSelectedDomain(domain)}
           options={el.domains.map((domenObj) => {
-            return { value: domenObj.domen, label: domenObj.name };
+            return { value: domenObj.domain, label: domenObj.name };
           })}
         />
       ),
@@ -85,7 +86,7 @@ export const getColumns = (): ColumnType<LinksColumnsDataTypes>[] => {
           style={{ marginBottom: 0, marginTop: 0 }}
           copyable
         >
-          {selectedDomen + "/" + shortLink}
+          {selectedDomain + "/" + shortLink}
         </Typography.Paragraph>
       ),
     },

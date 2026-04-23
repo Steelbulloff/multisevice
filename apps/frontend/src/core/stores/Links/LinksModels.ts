@@ -4,7 +4,8 @@ export interface LinksState {
   links: Link[];
   selectedLink: null | Link;
   selectedLinks: number[];
-  selectedDomen: string | null;
+  selectedDomain: string | null;
+  selectedDomainId: number | null;
   error: unknown;
   linksReady: boolean;
 
@@ -12,6 +13,11 @@ export interface LinksState {
   removeSelectedLinks: (selectedLinks: number[]) => void;
   setSelectedLinks: (id: any[]) => void;
   setSelectedLink: (link: Link) => void;
-  setSelectedDomen: (domen: string) => void;
+  setSelectedDomain: (domain: string) => void;
+  setSelectedDomainId: (
+    selectedLinkId: number,
+    domainId: number,
+    allDates: string[],
+  ) => void;
   getLinks: () => void;
 }

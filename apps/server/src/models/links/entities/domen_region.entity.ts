@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'domen_region' })
-export class LinksDomenRegion {
+export class LinksDomainRegion {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -9,5 +9,5 @@ export class LinksDomenRegion {
   name: string;
 
   @Column()
-  domen: string;
+  domain: string;
 }

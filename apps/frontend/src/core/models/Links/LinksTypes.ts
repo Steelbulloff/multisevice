@@ -6,7 +6,7 @@ export interface Link {
   name: string;
   origin: string;
   short_link: string;
-  domains: LinkDomen[];
+  domains: LinkDomain[];
   tags?: TagType[];
   statistic: {
     days_info: {
@@ -19,10 +19,10 @@ export interface Link {
     id: number;
   };
 }
-interface LinkDomen {
+interface LinkDomain {
   id: number;
   name: string;
-  domen: string;
+  domain: string;
 }
 
 export interface LinksColumnsDataTypes {

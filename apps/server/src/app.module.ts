@@ -7,7 +7,7 @@ import { ConfigModule } from '@nestjs/config';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: 'apps/server/.env.development', // Указываем путь один раз здесь
+      envFilePath: '.env', // Указываем путь один раз здесь
     }),
     CoreModule,
     ModelsModule,

@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { LinkStat } from './stat.entity';
-import { LinksDomenRegion } from './domen_region.entity';
-@Index(['link_stat', 'date', 'domen'], { unique: true }) // Уникальность для пары стат+дата+домен
+import { LinksDomainRegion } from './domen_region.entity';
+@Index(['link_stat', 'date', 'domain'], { unique: true }) // Уникальность для пары стат+дата+домен
 @Entity({ name: 'days_info' })
 export class DaysInfo {
   @PrimaryGeneratedColumn()
@@ -29,6 +29,6 @@ export class DaysInfo {
   link_stat: LinkStat;
 
   // Добавляем связь с доменом
-  @ManyToOne(() => LinksDomenRegion, { nullable: true, onDelete: 'SET NULL' })
-  domen: LinksDomenRegion;
+  @ManyToOne(() => LinksDomainRegion, { nullable: true, onDelete: 'SET NULL' })
+  domain: LinksDomainRegion;
 }

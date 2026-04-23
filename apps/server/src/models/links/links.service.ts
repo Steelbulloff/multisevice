@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   DaysInfo,
   Links,
-  LinksDomenRegion,
+  LinksDomainRegion,
   LinksTags,
   LinkStat,
 } from './entities';
@@ -23,8 +23,8 @@ export class LinksService {
     @InjectRepository(DaysInfo)
     private daysInfoRepository: Repository<DaysInfo>,
 
-    @InjectRepository(LinksDomenRegion)
-    private linksDomenRegionRepository: Repository<LinksDomenRegion>,
+    @InjectRepository(LinksDomainRegion)
+    private linksDomainRegionRepository: Repository<LinksDomainRegion>,
 
     @InjectRepository(LinksTags)
     private linksTagsRepository: Repository<LinksTags>,
@@ -59,7 +59,8 @@ export class LinksService {
       });
     } while (exists);
 
-    const allDomains = await this.linksDomenRegionRepository.find();
+    // TODO:Сделать автоматическое создание дефолтного домена с значением сервера
+    const allDomains = await this.linksDomainRegionRepository.find();
 
     // 3. Создание и сохранение в транзакции
     const result = await this.dataSource.transaction(async (manager) => {
@@ -82,18 +83,18 @@ export class LinksService {
         }),
       );
 
-      // 3.3. Инициализируем дневную статистику
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      // // 3.3. Инициализируем дневную статистику
+      // const today = new Date();
+      // today.setHours(0, 0, 0, 0);
 
-      await manager.save(
-        manager.create(DaysInfo, {
-          counter: 0,
-          date: today, // Используем новое поле date
-          link_stat: stat,
-          createdAt: new Date(), // Для аудита сохраняем точное время
-        }),
-      );
+      // await manager.save(
+      //   manager.create(DaysInfo, {
+      //     counter: 0,
+      //     date: today, // Используем новое поле date
+      //     link_stat: stat,
+      //     createdAt: new Date(), // Для аудита сохраняем точное время
+      //   }),
+      // );
 
       return link;
     });
@@ -124,43 +125,80 @@ export class LinksService {
     }));
   }
 
-  async getLinkInfo(id: number, userId: number, GetLinkDto?: GetLinkDto) {
-    const { dateList } = GetLinkDto || {};
+  async getLinkInfo(id: number, userId: number, query?: GetLinkDto) {
+    const { dateList, domainId } = query || {};
 
-    let dateSet: Set<string> | null = null;
-
-    if (dateList && dateList.length > 0) {
-      dateSet = new Set(dateList);
-    }
-
+    // Загружаем ссылку со статистикой и доменами
     const link = await this.linksRepository.findOne({
-      where: {
-        id,
-        user: { id: userId }, // 🔐 защита
-      },
-      relations: ['statistic', 'statistic.days_info', 'domen_region'],
+      where: { id, user: { id: userId } },
+      relations: [
+        'statistic',
+        'statistic.days_info',
+        'statistic.days_info.domain', // важно: подгружаем связанный домен
+        'domen_region',
+      ],
     });
 
     if (!link) {
       throw new HttpException('Link not found', HttpStatus.NOT_FOUND);
     }
 
-    const filteredDaysInfo = link.statistic.days_info.filter((day) => {
-      const dayStr = day.date.toISOString().split('T')[0]; // Используем поле date
-      if (dateSet) {
-        return dateSet.has(dayStr);
-      } else {
-        const today = new Date();
-        const cutoff = new Date();
-        cutoff.setDate(today.getDate() - 30);
-        return day.date >= cutoff && day.date <= today; // Используем поле date
-      }
-    });
+    let days = link.statistic.days_info;
 
-    const totalCounter = filteredDaysInfo.reduce(
-      (sum, day) => sum + day.counter,
-      0,
-    );
+    // Фильтр по датам
+    if (dateList?.length) {
+      const dateSet = new Set(dateList);
+      days = days.filter((day) =>
+        dateSet.has(day.date.toISOString().split('T')[0]),
+      );
+    } else {
+      // Последние 30 дней по умолчанию
+      const today = new Date();
+      const cutoff = new Date();
+      cutoff.setDate(today.getDate() - 30);
+      days = days.filter((day) => day.date >= cutoff && day.date <= today);
+    }
+
+    // Группировка по дате
+    const grouped = new Map<
+      string,
+      {
+        globalCounter: number;
+        domainCounters: Map<number, number>;
+      }
+    >();
+
+    for (const dayInfo of days) {
+      const dateKey = dayInfo.date.toISOString().split('T')[0];
+      if (!grouped.has(dateKey)) {
+        grouped.set(dateKey, { globalCounter: 0, domainCounters: new Map() });
+      }
+      const entry = grouped.get(dateKey)!;
+      entry.globalCounter += dayInfo.counter;
+
+      const domId = dayInfo.domain?.id;
+      if (domId) {
+        const prev = entry.domainCounters.get(domId) || 0;
+        entry.domainCounters.set(domId, prev + dayInfo.counter);
+      }
+    }
+
+    // Формируем результат
+    const daysInfoResult = Array.from(grouped.entries()).map(([date, data]) => {
+      // Если запрошен конкретный домен – добавим отдельное поле
+      const domainCounter = domainId
+        ? data.domainCounters.get(domainId) || 0
+        : undefined;
+      return {
+        date,
+        globalCounter: data.globalCounter,
+        ...(domainId && { domainCounter }),
+        // Если нужны все домены – отдаём объект
+        ...(!domainId && {
+          domainCounters: Object.fromEntries(data.domainCounters),
+        }),
+      };
+    });
 
     return {
       id: link.id,
@@ -168,8 +206,8 @@ export class LinksService {
       origin: link.origin,
       short_link: link.short_link,
       domains: link.domen_region,
-      totalCounter,
-      daysInfo: filteredDaysInfo,
+      totalCounter: daysInfoResult.reduce((sum, d) => sum + d.globalCounter, 0),
+      daysInfo: daysInfoResult,
     };
   }
 
@@ -219,8 +257,9 @@ export class LinksService {
       throw new HttpException('Short link not found', HttpStatus.NOT_FOUND);
     }
     const domainEntity = host
-      ? await this.linksDomenRegionRepository.findOneBy({ domen: host })
+      ? await this.linksDomainRegionRepository.findOneBy({ domain: host })
       : null;
+    console.log(domainEntity);
 
     const statId = link.statistic.id;
 
@@ -240,7 +279,7 @@ export class LinksService {
         where: {
           link_stat: { id: link.statistic.id },
           date: today,
-          domen: domainEntity ? { id: domainEntity.id } : { id: undefined },
+          domain: domainEntity ? { id: domainEntity.id } : { id: undefined },
         },
         lock: { mode: 'pessimistic_write' },
       });
@@ -255,7 +294,7 @@ export class LinksService {
             counter: 1,
             date: today,
             link_stat: link.statistic,
-            domen: domainEntity || undefined, // undefined для TypeORM превратится в NULL в БД
+            domain: domainEntity || undefined, // undefined для TypeORM превратится в NULL в БД
           }),
         );
       }

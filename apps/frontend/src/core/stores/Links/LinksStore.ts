@@ -10,7 +10,8 @@ export const useLinksStore = create<LinksState>((set) => ({
   selectedLink: null,
   selectedLinks: [],
   error: null,
-  selectedDomen: null,
+  selectedDomain: null,
+  selectedDomainId: null,
 
   setSelectedLinks: (ids: any[]) => {
     set({ selectedLinks: ids });
@@ -23,8 +24,17 @@ export const useLinksStore = create<LinksState>((set) => ({
     }));
   },
 
-  setSelectedDomen: (domen: string) => {
-    set({ selectedDomen: domen });
+  setSelectedDomain: (domain: string) => {
+    set({ selectedDomain: domain });
+  },
+  setSelectedDomainId: (
+    selectedLinkId: number,
+    domainId: number,
+    allDates: string[],
+  ) => {
+    set({ selectedDomainId: domainId });
+
+    linksApiService.getLinkInfo(selectedLinkId, allDates, domainId);
   },
 
   createLink: async (name: string, origin: string) => {

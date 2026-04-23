@@ -17,8 +17,18 @@ class LinkApiService {
     return response.data;
   }
 
-  async getLinkInfo(linkId: number, dateList?: string[]): Promise<Link> {
-    const params = dateList && dateList.length > 0 ? { dateList } : {};
+  async getLinkInfo(
+    linkId: number,
+    dateList?: string[],
+    domainId?: number,
+  ): Promise<Link> {
+    const params: Record<string, any> = {};
+    if (dateList?.length) {
+      params.dateList = dateList; // axios преобразует в dateList[]=...
+    }
+    if (domainId !== undefined) {
+      params.domainId = domainId;
+    }
     const response = await api.get(`${controller}/${linkId}`, {
       params,
     });

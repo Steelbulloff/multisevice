@@ -16,7 +16,7 @@ export const Links = () => {
     setSelectedLinks,
     removeSelectedLinks,
     getLinks,
-    setSelectedDomen,
+    setSelectedDomain,
   } = useLinksStore();
   const { setCreateLinkModal } = useModalsStore();
 
@@ -66,7 +66,7 @@ export const Links = () => {
   }));
 
   useEffect(() => {
-    setSelectedDomen(links[0]?.domains[0]?.domen);
+    setSelectedDomain(links[0]?.domains[0]?.domain);
   }, [links]);
 
   return (

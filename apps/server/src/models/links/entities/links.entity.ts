@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { LinkStat } from './stat.entity';
 import { User } from 'src/models/auth/entities';
-import { LinksDomenRegion } from './domen_region.entity';
+import { LinksDomainRegion } from './domen_region.entity';
 import { LinksTags } from './tags.entity';
 @Entity({ name: 'links' })
 export class Links {
@@ -42,11 +42,15 @@ export class Links {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToMany(() => LinksDomenRegion)
-  @JoinTable() // создает промежуточную таблицу
-  domen_region: LinksDomenRegion[];
+  @ManyToMany(() => LinksDomainRegion, {
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({ name: 'links_domen_region' }) // имя таблицы опционально
+  domen_region: LinksDomainRegion[];
 
-  @ManyToMany(() => LinksTags)
-  @JoinTable()
+  @ManyToMany(() => LinksTags, {
+    onDelete: 'CASCADE',
+  })
+  @JoinTable({ name: 'links_tags_links' })
   tags: LinksTags[];
 }
